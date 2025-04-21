@@ -49,4 +49,8 @@ node scripts/content/generate-docs-content.js
 # Purge unused CSS.
 yarn run minify-css
 
+# Generate optimized sitemaps
+printf "Generating optimized sitemaps...\n\n"
+./scripts/link-checker/generate-sitemaps.sh
+
 printf "Done!\n\n"

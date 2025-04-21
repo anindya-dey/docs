@@ -61,6 +61,16 @@ check_links:
 	$(MAKE) ensure
 	./scripts/link-checker/check-links.sh "https://www.pulumi.com"
 
+.PHONY: check_broken_links
+check_broken_links:
+	$(MAKE) banner
+	./scripts/check-broken-links.sh "https://www.pulumi.com" 20 "site"
+
+.PHONY: check_page_links
+check_page_links:
+	$(MAKE) banner
+	./scripts/check-broken-links.sh "https://www.pulumi.com" 1 "page" "$(PAGE)"
+
 .PHONY: check_search_urls
 check_search_urls:
 	$(MAKE) banner
@@ -168,3 +178,27 @@ destroy-dev-stack:
 generate-compliance-pages:
 	node scripts/aws-compliance-scraper/scrape.js
 	./scripts/content/generate-compliance-pages.sh
+
+.PHONY: generate-sitemaps
+generate-sitemaps:
+	@echo -e "\033[0;32mGenerating optimized sitemaps...\033[0m"
+	npm install xml2js --no-save --legacy-peer-deps
+	mkdir -p static/sitemaps
+	node scripts/link-checker/split-sitemap.js
+	@echo -e "\033[0;32mDone! Sitemaps generated in static/sitemaps/\033[0m"
+
+.PHONY: validate-sitemap
+validate-sitemap:
+	@echo -e "\033[0;32mValidating sitemap URLs...\033[0m"
+	./scripts/validate-sitemap-urls.sh production
+
+.PHONY: validate-sitemap-staging
+validate-sitemap-staging:
+	@echo -e "\033[0;32mValidating staging sitemap URLs...\033[0m"
+	./scripts/validate-sitemap-urls.sh staging
+
+.PHONY: check_all_links
+check_all_links:
+	$(MAKE) banner
+	@echo -e "\033[0;32mChecking sitemap and links...\033[0m"
+	./scripts/check-broken-links.sh "https://www.pulumi.com" 20 "site" "" "true"
